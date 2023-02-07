@@ -1,0 +1,67 @@
+<html>
+	<head>
+		<link type="text/css" rel="stylesheet" href="node_modules/@brokerize/elements/dist/style.css" />
+	</head>
+	<body>
+		<h1>some general remarks</h1>
+		<ul>
+			<li>
+				this file demonstrates a plain JavaScript way of using the
+				brokerize JS libraries
+			</li>
+			<li>just <i>view-source</i> to see how it works</li>
+			<li>
+				<a
+					href="#"
+					onclick="localStorage.removeItem('brokerize');location.reload();"
+					>click here to reset localStorage</a
+				>
+				(discards credentials)
+			</li>
+			<li>
+				<a href="#" onclick="showBrokerList()"
+					><code>showBrokerList</code></a
+				>
+				(when logged in)
+			</li>
+			<li>
+				<a href="#" onclick="showSessionsTable()"
+					><code>showSessionsTable</code></a
+				>
+				(when logged in)
+			</li>
+			<li>
+				<a href="#" onclick="showPortfolioTable()"
+					><code>showPortfolioTable</code></a
+				>
+				(when logged in)
+			</li>
+			<li>
+				more views to be added here... (e.g. Session TAN form, session
+				list, order lists, ...)
+			</li>
+		</ul>
+
+		<h1>the <code>renderTo</code> element</h1>
+		<div
+			id="content"
+			style="padding: 2em; margin: 2em; max-width: 70%"
+		></div>
+
+		<button
+			id="big-buy-button"
+			style="
+				display: none;
+				background-color: rgb(0, 255, 0);
+				font-size: 1.5em;
+			"
+			onclick="buy()"
+		>
+			click this button to buy in current portfolio
+		</button>
+
+		<script src="node_modules/@brokerize/elements/dist/bundle.umd.js"></script>
+		<script src="./config.js"></script>
+		<script src="./example.js"></script>
+	</body>
+</html>
