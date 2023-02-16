@@ -1,9 +1,13 @@
 <html>
-	<head>
-		<link type="text/css" rel="stylesheet" href="node_modules/@brokerize/elements/dist/style.css" />
-	</head>
 	<body>
 		<h1>some general remarks</h1>
+		<style>
+			.post-content ul:not(.no-list) {
+				list-style: disc;
+			}
+
+			html zl-module * { all: initial !important }
+		</style>
 		<ul>
 			<li>
 				this file demonstrates a plain JavaScript way of using the
@@ -13,7 +17,7 @@
 			<li>
 				<a
 					href="#"
-					onclick="localStorage.removeItem('brokerize');location.reload();"
+					onclick="sessionStorage.removeItem('brokerize');location.reload();"
 					>click here to reset localStorage</a
 				>
 				(discards credentials)
@@ -46,7 +50,9 @@
 		<div
 			id="content"
 			style="padding: 2em; margin: 2em; max-width: 70%"
-		></div>
+			class="post-content"
+		>
+		</div>
 
 		<button
 			id="big-buy-button"

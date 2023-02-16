@@ -3,9 +3,9 @@
 /**
  * The following typedef imports enable code completion in VS Code:
  */
-/** @typedef {import("@brokerize/elements/bundle").Client} BrokerizeClient} */
-/** @typedef {import("@brokerize/elements/bundle").Elements} BrokerizeElements} */
-/** @typedef {import("@brokerize/elements/bundle").BrokerizeElement} BrokerizeElement} */
+/** @typedef {import("@brokerize/elements").Client} BrokerizeClient} */
+/** @typedef {import("@brokerize/elements").Elements} BrokerizeElements} */
+/** @typedef {import("@brokerize/elements").BrokerizeElement} BrokerizeElement} */
 /** @typedef {{ Client: BrokerizeClient; Elements:BrokerizeElements }} BrokerizeBundle} */
 const Brokerize = /** @type {BrokerizeBundle} */ (window.Brokerize);
 
@@ -35,7 +35,10 @@ const client = new Brokerize.Client.Brokerize({
 let globalApiCtx = null;
 
 /* let's render everything in the #content element */
-const $el = document.getElementById('content');
+const $el = document.getElementById('content').attachShadow({
+	mode: 'open'
+});
+
 /**
  * @type {BrokerizeElement}
  */
@@ -52,8 +55,7 @@ function setCurrentPortfolioId(id) {
 function resetRenderTo() {
 	currentElement && currentElement.destroy();
 	setCurrentPortfolioId(null);
-
-	$el.innerHTML = '';
+	$el.innerHTML = '<link type="text/css" rel="stylesheet" href="node_modules/@brokerize/elements/dist/style.css">';
 	return $el;
 }
 
@@ -75,7 +77,6 @@ function cleanUpUrl() {
 }
 
 /* restore session from sessionStorage, if possible */
-/* restore session from local storage, if possible */
 function initSessionIf() {
 	const scfg = sessionStorage.getItem('brokerize');
 	const cfg = scfg ? JSON.parse(scfg) : null;
@@ -84,6 +85,10 @@ function initSessionIf() {
 		showLogin();
 	} else {
 		globalApiCtx = client.createAuthorizedContext(cfg);
+		globalApiCtx.subscribeLogout((err)=>{
+			console.log(err, 'guest user has been logged out from brokerize API.');
+			showLogin();
+		});
 
 		const urlParams = new URLSearchParams(window.location.search);
 		if (urlParams.get('verifysession')) {
@@ -117,6 +122,7 @@ const theme = {
 	logoStyle: 'light',
 	tokens: {
 		'zl-border-radius': '.3rem',
+		'zl-notification-bg-color': 'var(--zl-colors-dark1)'
 		/* ...many more tokens are available (see theming tool) */
 	}
 };
@@ -255,23 +261,35 @@ function showOrderForm(portfolioId, isin) {
 	});
 }
 
-function showLogin() {
-	Brokerize.Elements.createLoginForm({
-		renderTo: resetRenderTo(),
-		theme,
-		client,
-		onGuestLogin() {
-			client.createGuestUser().then(
-				(authCtxCfg) => {
-					setLogin(authCtxCfg);
-				},
-				(err) => showError(err)
-			);
-		},
-		onLogin(authCtxCfg) {
+function logInAsGuest() {
+	console.log('logging in as guest');
+	client.createGuestUser().then(
+		(authCtxCfg) => {
 			setLogin(authCtxCfg);
-		}
-	});
+		},
+		(err) => showError(err)
+	);
+}
+
+function showLogin() {
+	if (config.COGNITO_CLIENT_ID) {
+		/* the client supports brokerize user logins. */
+		Brokerize.Elements.createLoginForm({
+			renderTo: resetRenderTo(),
+			theme,
+			client,
+			onGuestLogin() {
+				logInAsGuest();
+			},
+			onLogin(authCtxCfg) {
+				setLogin(authCtxCfg);
+			}
+		});
+	} else {
+		/* the client only supports guest users */
+		logInAsGuest();
+	}
+	
 }
 
 /* ... more calls to Brokerize.Elements.createXXXXXX to be added here ... */
