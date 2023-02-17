@@ -35,9 +35,7 @@ const client = new Brokerize.Client.Brokerize({
 let globalApiCtx = null;
 
 /* let's render everything in the #content element */
-const $el = document.getElementById('content').attachShadow({
-	mode: 'open'
-});
+const $el = document.getElementById('content');
 
 /**
  * @type {BrokerizeElement}
@@ -55,7 +53,7 @@ function setCurrentPortfolioId(id) {
 function resetRenderTo() {
 	currentElement && currentElement.destroy();
 	setCurrentPortfolioId(null);
-	$el.innerHTML = '<link type="text/css" rel="stylesheet" href="node_modules/@brokerize/elements/dist/style.css">';
+	$el.innerHTML = '';
 	return $el;
 }
 
@@ -114,23 +112,29 @@ function initSessionIf() {
 }
 
 /* theme configuration. example themes are available under https://app.brokerize.com/theming/ */
-const theme = {
-	name: 'Default',
-	icon: 'circlehollow',
-	id: 'default',
-	layout: 'columns',
-	logoStyle: 'light',
-	tokens: {
-		'zl-border-radius': '.3rem',
-		'zl-notification-bg-color': 'var(--zl-colors-dark1)'
-		/* ...many more tokens are available (see theming tool) */
-	}
-};
+const renderConfig = {
+	theme: {
+		name: 'Default',
+		icon: 'circlehollow',
+		id: 'default',
+		layout: 'columns',
+		logoStyle: 'light',
+		tokens: {
+			'zl-border-radius': '.3rem',
+			'zl-notification-bg-color': 'var(--zl-colors-dark1)'
+			/* ...many more tokens are available (see theming tool) */
+		}
+	},
+	/* brokerize elements may load required assets like stylesheets. this should be the public path
+	   to the brokerize elements "dist" directory */
+	assetsPath: "/node_modules/@brokerize/elements/dist"
+}
+
 
 function showBrokerLogin(brokerName) {
 	Brokerize.Elements.createBrokerLoginForm({
 		renderTo: resetRenderTo(),
-		theme,
+		renderConfig,
 		brokerName,
 		authorizedApiContext: globalApiCtx,
 		onExit({ loggedIn }) {
@@ -146,7 +150,7 @@ function showBrokerList() {
 	}
 
 	Brokerize.Elements.createBrokerList({
-		theme,
+		renderConfig,
 		renderTo: resetRenderTo(),
 		authorizedApiContext: globalApiCtx,
 		onLogin({ brokerName }) {
@@ -171,7 +175,7 @@ function showPortfolioTable() {
 	}
 
 	Brokerize.Elements.createPortfolioTable({
-		theme,
+		renderConfig,
 		renderTo: resetRenderTo(),
 		authorizedApiContext: globalApiCtx,
 		onNavigate(portfolio) {
@@ -186,7 +190,7 @@ function showPortfolioView(portfolioId) {
 	}
 
 	Brokerize.Elements.createPortfolioView({
-		theme,
+		renderConfig,
 		renderTo: resetRenderTo(),
 		authorizedApiContext: globalApiCtx,
 		portfolioId,
@@ -221,7 +225,7 @@ function showSessionsTable() {
 	}
 
 	Brokerize.Elements.createSessionsTable({
-		theme,
+		renderConfig,
 		renderTo: resetRenderTo(),
 		authorizedApiContext: globalApiCtx,
 		onEnableSessionTan({ sessionId }) {
@@ -236,7 +240,7 @@ function showOrderForm(portfolioId, isin) {
 	}
 
 	Brokerize.Elements.createOrderForm({
-		theme,
+		renderConfig,
 		renderTo: resetRenderTo(),
 		authorizedApiContext: globalApiCtx,
 
@@ -276,7 +280,7 @@ function showLogin() {
 		/* the client supports brokerize user logins. */
 		Brokerize.Elements.createLoginForm({
 			renderTo: resetRenderTo(),
-			theme,
+			renderConfig,
 			client,
 			onGuestLogin() {
 				logInAsGuest();
