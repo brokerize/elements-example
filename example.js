@@ -3,9 +3,9 @@
 /**
  * The following typedef imports enable code completion in VS Code:
  */
-/** @typedef {import("@brokerize/elements/bundle").Client} BrokerizeClient} */
-/** @typedef {import("@brokerize/elements/bundle").Elements} BrokerizeElements} */
-/** @typedef {import("@brokerize/elements/bundle").BrokerizeElement} BrokerizeElement} */
+/** @typedef {import("@brokerize/elements").Client} BrokerizeClient} */
+/** @typedef {import("@brokerize/elements").Elements} BrokerizeElements} */
+/** @typedef {import("@brokerize/elements").BrokerizeElement} BrokerizeElement} */
 /** @typedef {{ Client: BrokerizeClient; Elements:BrokerizeElements }} BrokerizeBundle} */
 const Brokerize = /** @type {BrokerizeBundle} */ (window.Brokerize);
 
@@ -36,6 +36,7 @@ let globalApiCtx = null;
 
 /* let's render everything in the #content element */
 const $el = document.getElementById('content');
+
 /**
  * @type {BrokerizeElement}
  */
@@ -52,7 +53,6 @@ function setCurrentPortfolioId(id) {
 function resetRenderTo() {
 	currentElement && currentElement.destroy();
 	setCurrentPortfolioId(null);
-
 	$el.innerHTML = '';
 	return $el;
 }
@@ -75,7 +75,6 @@ function cleanUpUrl() {
 }
 
 /* restore session from sessionStorage, if possible */
-/* restore session from local storage, if possible */
 function initSessionIf() {
 	const scfg = sessionStorage.getItem('brokerize');
 	const cfg = scfg ? JSON.parse(scfg) : null;
@@ -84,6 +83,10 @@ function initSessionIf() {
 		showLogin();
 	} else {
 		globalApiCtx = client.createAuthorizedContext(cfg);
+		globalApiCtx.subscribeLogout((err)=>{
+			console.log(err, 'guest user has been logged out from brokerize API.');
+			showLogin();
+		});
 
 		const urlParams = new URLSearchParams(window.location.search);
 		if (urlParams.get('verifysession')) {
@@ -109,22 +112,29 @@ function initSessionIf() {
 }
 
 /* theme configuration. example themes are available under https://app.brokerize.com/theming/ */
-const theme = {
-	name: 'Default',
-	icon: 'circlehollow',
-	id: 'default',
-	layout: 'columns',
-	logoStyle: 'light',
-	tokens: {
-		'zl-border-radius': '.3rem',
-		/* ...many more tokens are available (see theming tool) */
-	}
-};
+const renderConfig = {
+	theme: {
+		name: 'Default',
+		icon: 'circlehollow',
+		id: 'default',
+		layout: 'columns',
+		logoStyle: 'light',
+		tokens: {
+			'zl-border-radius': '.3rem',
+			'zl-notification-bg-color': 'var(--zl-colors-dark1)'
+			/* ...many more tokens are available (see theming tool) */
+		}
+	},
+	/* brokerize elements may load required assets like stylesheets. this should be the public path
+	   to the brokerize elements "dist" directory */
+	assetsPath: "/node_modules/@brokerize/elements/dist"
+}
+
 
 function showBrokerLogin(brokerName) {
 	Brokerize.Elements.createBrokerLoginForm({
 		renderTo: resetRenderTo(),
-		theme,
+		renderConfig,
 		brokerName,
 		authorizedApiContext: globalApiCtx,
 		onExit({ loggedIn }) {
@@ -140,7 +150,7 @@ function showBrokerList() {
 	}
 
 	Brokerize.Elements.createBrokerList({
-		theme,
+		renderConfig,
 		renderTo: resetRenderTo(),
 		authorizedApiContext: globalApiCtx,
 		onLogin({ brokerName }) {
@@ -165,7 +175,7 @@ function showPortfolioTable() {
 	}
 
 	Brokerize.Elements.createPortfolioTable({
-		theme,
+		renderConfig,
 		renderTo: resetRenderTo(),
 		authorizedApiContext: globalApiCtx,
 		onNavigate(portfolio) {
@@ -180,7 +190,7 @@ function showPortfolioView(portfolioId) {
 	}
 
 	Brokerize.Elements.createPortfolioView({
-		theme,
+		renderConfig,
 		renderTo: resetRenderTo(),
 		authorizedApiContext: globalApiCtx,
 		portfolioId,
@@ -215,7 +225,7 @@ function showSessionsTable() {
 	}
 
 	Brokerize.Elements.createSessionsTable({
-		theme,
+		renderConfig,
 		renderTo: resetRenderTo(),
 		authorizedApiContext: globalApiCtx,
 		onEnableSessionTan({ sessionId }) {
@@ -230,7 +240,7 @@ function showOrderForm(portfolioId, isin) {
 	}
 
 	Brokerize.Elements.createOrderForm({
-		theme,
+		renderConfig,
 		renderTo: resetRenderTo(),
 		authorizedApiContext: globalApiCtx,
 
@@ -255,23 +265,35 @@ function showOrderForm(portfolioId, isin) {
 	});
 }
 
-function showLogin() {
-	Brokerize.Elements.createLoginForm({
-		renderTo: resetRenderTo(),
-		theme,
-		client,
-		onGuestLogin() {
-			client.createGuestUser().then(
-				(authCtxCfg) => {
-					setLogin(authCtxCfg);
-				},
-				(err) => showError(err)
-			);
-		},
-		onLogin(authCtxCfg) {
+function logInAsGuest() {
+	console.log('logging in as guest');
+	client.createGuestUser().then(
+		(authCtxCfg) => {
 			setLogin(authCtxCfg);
-		}
-	});
+		},
+		(err) => showError(err)
+	);
+}
+
+function showLogin() {
+	if (config.COGNITO_CLIENT_ID) {
+		/* the client supports brokerize user logins. */
+		Brokerize.Elements.createLoginForm({
+			renderTo: resetRenderTo(),
+			renderConfig,
+			client,
+			onGuestLogin() {
+				logInAsGuest();
+			},
+			onLogin(authCtxCfg) {
+				setLogin(authCtxCfg);
+			}
+		});
+	} else {
+		/* the client only supports guest users */
+		logInAsGuest();
+	}
+	
 }
 
 /* ... more calls to Brokerize.Elements.createXXXXXX to be added here ... */
