@@ -278,9 +278,11 @@ function showCancelOrderForm(portfolioId, orderId) {
 
         orderId,
         portfolioId,
-        onExit: () => resetRenderTo(),
+        onExit: () => {
+            alert('Order gestrichen... ✅');
+            showPortfolioView(portfolioId);
+        },
         onNavigate: (linkTarget) => {
-            debugger;
             showPortfolioView(linkTarget.portfolioId);
         },
     });
