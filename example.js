@@ -145,6 +145,9 @@ const renderConfig = {
 };
 
 function showBrokerLogin(brokerName) {
+    /* if required, store the state of the app here (e.g. id of current view in sessionStorage). */
+    // storeAppStateInSessionStorage();
+
     Brokerize.Elements.createBrokerLoginForm({
         renderTo: resetRenderTo(),
         renderConfig,
@@ -153,6 +156,10 @@ function showBrokerLogin(brokerName) {
         onExit({ loggedIn }) {
             showPortfolioTable();
         },
+
+        // returnTo URL to use for OAuth based broker logins. Dfaults to window.location.href,
+        // but can be overriden (for example if there is a fixed "re-entry" URL)
+        returnToUrl: 'http://localhost:8080' 
     });
 }
 
