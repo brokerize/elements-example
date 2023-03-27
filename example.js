@@ -4,7 +4,6 @@
  * The following typedef imports enable code completion in VS Code:
  */
 /** @typedef {import("@brokerize/elements").Client} BrokerizeClient} */
-/** @typedef {import("@brokerize/elements").Client} BrokerizeClient} */
 /** @typedef {import("@brokerize/elements").Elements} BrokerizeElements} */
 /** @typedef {import("@brokerize/elements").BrokerizeElement} BrokerizeElement} */
 /** @typedef {{ Client: BrokerizeClient; Elements:BrokerizeElements }} BrokerizeBundle} */
@@ -148,7 +147,7 @@ function showBrokerLogin(brokerName) {
     /* if required, store the state of the app here (e.g. id of current view in sessionStorage). */
     // storeAppStateInSessionStorage();
 
-    Brokerize.Elements.createBrokerLoginForm({
+    currentElement = Brokerize.Elements.createBrokerLoginForm({
         renderTo: resetRenderTo(),
         renderConfig,
         brokerName,
@@ -168,7 +167,7 @@ function showBrokerList() {
         return alert("you must authorize first.");
     }
 
-    Brokerize.Elements.createBrokerList({
+    currentElement = Brokerize.Elements.createBrokerList({
         renderConfig,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
@@ -195,7 +194,7 @@ function showPortfolioTable() {
         return alert("you must authorize first.");
     }
 
-    Brokerize.Elements.createPortfolioTable({
+    currentElement = Brokerize.Elements.createPortfolioTable({
         renderConfig,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
@@ -212,7 +211,7 @@ function showPortfolioView(portfolioId) {
 
     setLastUsedPortfolio(portfolioId);
 
-    Brokerize.Elements.createPortfolioView({
+    currentElement = Brokerize.Elements.createPortfolioView({
         renderConfig,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
@@ -267,7 +266,7 @@ function showSessionsTable() {
         return alert("you must authorize first.");
     }
 
-    Brokerize.Elements.createSessionsTable({
+    currentElement = Brokerize.Elements.createSessionsTable({
         renderConfig,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
@@ -278,7 +277,7 @@ function showSessionsTable() {
 }
 
 function showCancelOrderForm(portfolioId, orderId) {
-    Brokerize.Elements.createCancelOrderForm({
+    currentElement = Brokerize.Elements.createCancelOrderForm({
         renderConfig,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
@@ -296,7 +295,7 @@ function showCancelOrderForm(portfolioId, orderId) {
 }
 
 function showChangeOrderForm(orderId) {
-    Brokerize.Elements.createChangeOrderForm({
+    currentElement = Brokerize.Elements.createChangeOrderForm({
         renderConfig,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
@@ -315,7 +314,7 @@ function showOrderForm(portfolioId, isin, initialOrder) {
         return alert("you must authorize first.");
     }
 
-    Brokerize.Elements.createOrderForm({
+    currentElement = Brokerize.Elements.createOrderForm({
         renderConfig,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
@@ -352,10 +351,36 @@ function logInAsGuest() {
     );
 }
 
+async function loadPortfolioInfo(portfolioId) {
+    const { portfolios } = await globalApiCtx.getPortfolios();
+    const portfolio = portfolios.find(p=>p.id == portfolioId);
+
+    if (!portfolio) {
+        return null;
+    }
+
+    const {brokers} = await globalApiCtx.getBrokers();
+    const broker = brokers.find(broker=>broker.brokerName == portfolio.brokerName);
+    return {
+        brokerDisplayName: broker.displayName,
+        portfolio: portfolio.portfolioName
+    };
+}
+
+async function resolvePortfolioName() {
+    const portfolioId = prompt("Please provide the portfolio id to look up");
+    if (!portfolioId) {
+        return;
+    }
+
+    const data = await loadPortfolioInfo(portfolioId);
+    alert(JSON.stringify(data, null, 4));
+}
+
 function showLogin() {
     if (config.COGNITO_CLIENT_ID) {
         /* the client supports brokerize user logins. */
-        Brokerize.Elements.createLoginForm({
+        currentElement = Brokerize.Elements.createLoginForm({
             renderTo: resetRenderTo(),
             renderConfig,
             client,
