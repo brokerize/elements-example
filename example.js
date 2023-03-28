@@ -3,10 +3,11 @@
 /**
  * The following typedef imports enable code completion in VS Code:
  */
+/** @typedef {import("@brokerize/elements").Client.AuthorizedApiContext} AuthorizedApiContext} */
 /** @typedef {import("@brokerize/elements").Client} BrokerizeClient} */
 /** @typedef {import("@brokerize/elements").Elements} BrokerizeElements} */
 /** @typedef {import("@brokerize/elements").BrokerizeElement} BrokerizeElement} */
-/** @typedef {{ Client: BrokerizeClient; Elements:BrokerizeElements }} BrokerizeBundle} */
+/** @typedef {import("@brokerize/elements")} BrokerizeBundle} */
 const Brokerize = /** @type {BrokerizeBundle} */ (window.Brokerize);
 
 const config = window.BROKERIZE_CONFIG;
@@ -23,9 +24,12 @@ const client = new Brokerize.Client.Brokerize({
     basePath: config.API_URL,
     clientId: config.CLIENT_ID,
     cognito: {
-        UserPoolId: "eu-central-1_jRMDxLPQW",
-        ClientId: config.COGNITO_CLIENT_ID,
-        Endpoint: null,
+        cognitoFacade: Brokerize.cognitoFacade,
+        poolConfig: {
+            UserPoolId: "eu-central-1_jRMDxLPQW",
+            ClientId: config.COGNITO_CLIENT_ID,
+            Endpoint: null,
+        },
     },
     // provide global dependencies
     fetch: window.fetch.bind(window),
@@ -34,6 +38,9 @@ const client = new Brokerize.Client.Brokerize({
 });
 
 /* this changes when the user logs in/out of brokerize or starts/ends guest sessions */
+/**
+ * @type {AuthorizedApiContext}
+ */
 let globalApiCtx = null;
 
 /* let's render everything in the #content element */
@@ -44,7 +51,7 @@ function setLastUsedPortfolio(id) {
 }
 
 function getLastUsedPortfolio() {
-    return window.localStorage.getItem("lastportfolio")||null;
+    return window.localStorage.getItem("lastportfolio") || null;
 }
 
 /**
@@ -158,7 +165,7 @@ function showBrokerLogin(brokerName) {
 
         // returnTo URL to use for OAuth based broker logins. Dfaults to window.location.href,
         // but can be overriden (for example if there is a fixed "re-entry" URL)
-        returnToUrl: 'http://localhost:8080' 
+        returnToUrl: "http://localhost:8080",
     });
 }
 
@@ -246,7 +253,6 @@ function showReceipt(orderId) {
 
         orderId,
         onNavigate: (linkTarget) => {
-            debugger
             showPortfolioView(linkTarget.portfolioId);
         },
     });
@@ -285,7 +291,7 @@ function showCancelOrderForm(portfolioId, orderId) {
         orderId,
         portfolioId,
         onExit: () => {
-            alert('Order gestrichen... ✅');
+            alert("Order gestrichen... ✅");
             showPortfolioView(portfolioId);
         },
         onNavigate: (linkTarget) => {
@@ -353,17 +359,19 @@ function logInAsGuest() {
 
 async function loadPortfolioInfo(portfolioId) {
     const { portfolios } = await globalApiCtx.getPortfolios();
-    const portfolio = portfolios.find(p=>p.id == portfolioId);
+    const portfolio = portfolios.find((p) => p.id == portfolioId);
 
     if (!portfolio) {
         return null;
     }
 
-    const {brokers} = await globalApiCtx.getBrokers();
-    const broker = brokers.find(broker=>broker.brokerName == portfolio.brokerName);
+    const { brokers } = await globalApiCtx.getBrokers();
+    const broker = brokers.find(
+        (broker) => broker.brokerName == portfolio.brokerName
+    );
     return {
         brokerDisplayName: broker.displayName,
-        portfolio: portfolio.portfolioName
+        portfolio: portfolio.portfolioName,
     };
 }
 
@@ -421,7 +429,7 @@ async function startExampleOrderFlow() {
     if (!portfolioId) {
         showBrokerList();
     } else {
-        showOrderForm(portfolioId, 'US0378331005', {
+        showOrderForm(portfolioId, "US0378331005", {
             direction: "buy",
             orderModel: "limit",
             limit: 15,
