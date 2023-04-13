@@ -166,6 +166,20 @@ function showBrokerLogin(brokerName) {
         // returnTo URL to use for OAuth based broker logins. Dfaults to window.location.href,
         // but can be overriden (for example if there is a fixed "re-entry" URL)
         returnToUrl: "http://localhost:8080",
+
+        // example code for interacting with a secure credential storage. This interface can be used to store credentials *in native apps*
+        // web apps MUST NOT store those credentials - there is no browser API to do this. Web apps simply rely on the browser's
+        // password manager functionality.
+        // credentialsStore: {
+        //     async storeCredentials(label, brokerName, value) {
+        //         console.log('ask user if they want to store their credentials with name ' + label + ' in the secure storage');
+        //         secureStorage[brokerName] = value;
+        //     },
+        //     async loadCredentials(brokerName) {
+        //         console.log('prompt user to load the credentials from the secure storage')
+        //         return secureStorage[brokerName];
+        //     }
+        // }
     });
 }
 
