@@ -358,6 +358,12 @@ function showOrderForm(portfolioId, isin, initialOrder) {
         onOrderCreated(createdTrade) {
             showReceipt(createdTrade.orderId);
         },
+
+        // if openExternalLink is provided, external URLs (e.g. for cost estimation documents)
+        // will be opened with this function.
+        // openExternalLink(url) {
+        //     alert('TODO: navigate to the URL: ' + url);
+        // }
     });
 }
 
