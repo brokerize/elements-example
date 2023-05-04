@@ -364,6 +364,16 @@ function showOrderForm(portfolioId, isin, initialOrder) {
         // openExternalLink(url) {
         //     alert('TODO: navigate to the URL: ' + url);
         // }
+
+        // if saveDownloadedFile is provided, this will be called when the user saves a document (e.g. cost estimation PDF files).
+        // async saveDownloadedFile(download) {
+        //    const downloadUrl = URL.createObjectURL(download.blob);
+        //    const a = document.createElement('a');
+        //    a.href = downloadUrl;
+        //    a.download = download.filename;
+        //    document.body.appendChild(a);
+        //    a.click();
+        // }
     });
 }
 
