@@ -273,11 +273,17 @@ function showReceipt(orderId) {
 }
 
 function showSessionTanForm(sessionId) {
-    Brokerize.Elements.createSessionTanForm({
+    currentElement = Brokerize.Elements.createSessionTanForm({
         sessionId,
         renderConfig,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
+        onExit: ({enabled}) => {
+            // if (enabled) {
+            //     alert('Session-TAN aktiviert ✅');
+            // }
+            showSessionsTable();
+        }
     });
 }
 
