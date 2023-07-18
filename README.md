@@ -12,7 +12,7 @@ brokerize support will provide you with:
 The repo is configured to use our private package registry for the `@brokerize` namespace (see `.npmrc`). In order to install from the repository, run this command with the token provided to you by brokerize.
 
 ```
-$ npm config set 'https://npm.pkg.github.com/:_authToken' --location project "<PROVIDED_GITHUB_PACKAGE_INSTALL_TOKEN>"
+$ npm config set '//npm.pkg.github.com/:_authToken' --location project "<PROVIDED_GITHUB_PACKAGE_INSTALL_TOKEN>"
 ```
 
 Now you're ready to install the dependencies:
