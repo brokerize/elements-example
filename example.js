@@ -26,7 +26,7 @@ const client = new Brokerize.Client.Brokerize({
     cognito: {
         cognitoFacade: Brokerize.cognitoFacade,
         poolConfig: {
-            UserPoolId: "eu-central-1_jRMDxLPQW",
+            UserPoolId: config.COGNITO_USER_POOL_ID,
             ClientId: config.COGNITO_CLIENT_ID,
             Endpoint: null,
         },
@@ -149,6 +149,14 @@ const renderConfig = {
 	   to the brokerize elements "dist" directory */
     assetsPath: "/node_modules/@brokerize/elements/dist",
 };
+function showMainWebComponent() {
+    currentElement = Brokerize.Elements.createBrokerizeMain({
+        renderTo: resetRenderTo(),
+        renderConfig,
+        authorizedApiContext: globalApiCtx,
+        useNavigation: true,
+    });
+}
 
 function showBrokerLogin(brokerName) {
     /* if required, store the state of the app here (e.g. id of current view in sessionStorage). */
@@ -192,6 +200,9 @@ function showBrokerList() {
         renderConfig,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
+        openExternalLink: (url, target, features) => {
+            window.open(url, target, features);
+        },
         onLogin({ brokerName }) {
             showBrokerLogin(brokerName);
         },
@@ -278,12 +289,12 @@ function showSessionTanForm(sessionId) {
         renderConfig,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
-        onExit: ({enabled}) => {
+        onExit: ({ enabled }) => {
             // if (enabled) {
             //     alert('Session-TAN aktiviert ✅');
             // }
             showSessionsTable();
-        }
+        },
     });
 }
 
