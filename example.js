@@ -180,6 +180,15 @@ function setUpModalPortal(authorizedApiContext) {
     });
 }
 
+// Example for overriding methods on the modalService:
+// Brokerize.Elements.modalService.override({
+//     showDetailedTable(table) {
+//         setTimeout(()=>{
+//             alert("custom implementation of showDetailedTable: " + JSON.stringify(table));
+//         }, 200);
+//     }
+// })
+
 /* theme configuration. example themes are available under https://app.brokerize.com/theming/ */
 const theme = {
     layout: "columns",
