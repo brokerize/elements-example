@@ -191,13 +191,11 @@ function setUpModalPortal(authorizedApiContext) {
 
 /* theme configuration. example themes are available under https://app.brokerize.com/theming/ */
 const theme = {
-    layout: "columns",
-    logoStyle: "light",
-    tokens: {
-        "zl-border-radius": ".3rem",
-        "zl-notification-bg-color": "var(--zl-colors-dark1)",
-        /* ...many more tokens are available (see theming tool) */
-    }
+    layout: 'block',
+	logoStyle: 'light',
+	tokens: {
+		// 'zl-color-primary-base': 'red', /* just a flashy example */
+	}
 };
 
 function showBrokerLogin(brokerName) {
