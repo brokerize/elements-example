@@ -60,14 +60,14 @@ const client = new Brokerize.Client.Brokerize({
     // API configuration
     basePath: config.API_URL,
     clientId: config.CLIENT_ID,
-    cognito: {
+    cognito: config.COGNITO_CLIENT_ID ? {
         cognitoFacade: Brokerize.cognitoFacade,
         poolConfig: {
             UserPoolId: "eu-central-1_jRMDxLPQW",
             ClientId: config.COGNITO_CLIENT_ID,
             Endpoint: null,
         },
-    },
+    } : undefined,
     // provide global dependencies
     fetch: window.fetch.bind(window),
     createAbortController: () => new AbortController(),
