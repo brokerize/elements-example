@@ -7,6 +7,7 @@
 /** @typedef {import("@brokerize/elements").Client} BrokerizeClient} */
 /** @typedef {import("@brokerize/elements").Elements} BrokerizeElements} */
 /** @typedef {import("@brokerize/elements").BrokerizeElement} BrokerizeElement} */
+/** @typedef {import("@brokerize/elements").SecurityQuotesProvider} SecurityQuotesProvider} */
 /** @typedef {import("@brokerize/elements")} BrokerizeBundle} */
 const Brokerize = /** @type {BrokerizeBundle} */ (window.Brokerize);
 
@@ -19,6 +20,42 @@ if (!config || !config.CLIENT_ID) {
     throw new Error("No config provided");
 }
 
+/**
+ * @type {SecurityQuotesProvider}
+ */
+const quotesProvider = (opts) => {
+		console.log('TODO: init a quotes provider here ', opts);
+		return {
+			async loadMeta() {
+				await new Promise((resolve) => setTimeout(resolve, 3000));
+				return {
+					currency: 'EUR',
+					decimals: 2,
+					quoteSourceName: 'My Quotes Provider'
+				};
+			},
+			subscribe(cb) {
+				const intvl = setInterval(() => {
+					cb(null, {
+						ask: {
+							date: new Date(),
+							quote: 42 + Math.random()
+						},
+						bid: {
+							date: new Date(),
+							quote: 84 + Math.random()
+						}
+					});
+				}, 1000);
+
+				return {
+					unsubscribe() {
+						clearInterval(intvl);
+					}
+				};
+			}
+		};
+	};
 const client = new Brokerize.Client.Brokerize({
     // API configuration
     basePath: config.API_URL,
@@ -108,6 +145,8 @@ function initSessionIf() {
             showLogin();
         });
 
+        setUpModalPortal(globalApiCtx);
+
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get("verifysession")) {
             const code = urlParams.get("code");
@@ -131,23 +170,32 @@ function initSessionIf() {
     }
 }
 
+let modalHost = null;
+function setUpModalPortal(authorizedApiContext) {
+    modalHost?.destroy();
+    modalHost = Brokerize.Elements.createModalHost({
+        authorizedApiContext,
+        renderTo: document.getElementById('brokerize-modal-portal'),
+        theme
+    });
+}
+
+// Example for overriding methods on the modalService:
+// Brokerize.Elements.modalService.override({
+//     showDetailedTable(table) {
+//         setTimeout(()=>{
+//             alert("custom implementation of showDetailedTable: " + JSON.stringify(table));
+//         }, 200);
+//     }
+// })
+
 /* theme configuration. example themes are available under https://app.brokerize.com/theming/ */
-const renderConfig = {
-    theme: {
-        name: "Default",
-        icon: "circlehollow",
-        id: "default",
-        layout: "columns",
-        logoStyle: "light",
-        tokens: {
-            "zl-border-radius": ".3rem",
-            "zl-notification-bg-color": "var(--zl-colors-dark1)",
-            /* ...many more tokens are available (see theming tool) */
-        },
-    },
-    /* brokerize elements may load required assets like stylesheets. this should be the public path
-	   to the brokerize elements "dist" directory */
-    assetsPath: "/node_modules/@brokerize/elements/dist",
+const theme = {
+    layout: 'block',
+	logoStyle: 'light',
+	tokens: {
+		// 'zl-color-primary-base': 'red', /* just a flashy example */
+	}
 };
 
 function showBrokerLogin(brokerName) {
@@ -156,7 +204,7 @@ function showBrokerLogin(brokerName) {
 
     currentElement = Brokerize.Elements.createBrokerLoginForm({
         renderTo: resetRenderTo(),
-        renderConfig,
+        theme,
         brokerName,
         authorizedApiContext: globalApiCtx,
         onExit({ loggedIn }) {
@@ -189,7 +237,7 @@ function showBrokerList() {
     }
 
     currentElement = Brokerize.Elements.createBrokerList({
-        renderConfig,
+        theme,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
         onLogin({ brokerName }) {
@@ -216,7 +264,7 @@ function showPortfolioTable() {
     }
 
     currentElement = Brokerize.Elements.createPortfolioTable({
-        renderConfig,
+        theme,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
         onNavigate(portfolio) {
@@ -233,10 +281,13 @@ function showPortfolioView(portfolioId) {
     setLastUsedPortfolio(portfolioId);
 
     currentElement = Brokerize.Elements.createPortfolioView({
-        renderConfig,
+        theme,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
         portfolioId,
+        // openExternalLink(url) {
+        //   open the external URL here. For example, this can be used in mobile apps to use a custom way of showing external content.
+        // },
         onBuy(opts) {
             showOrderForm(portfolioId, opts.isin, { direction: "buy" });
         },
@@ -261,7 +312,7 @@ function showPortfolioView(portfolioId) {
 
 function showReceipt(orderId) {
     Brokerize.Elements.createOrderReceipt({
-        renderConfig,
+        theme,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
 
@@ -275,7 +326,7 @@ function showReceipt(orderId) {
 function showSessionTanForm(sessionId) {
     currentElement = Brokerize.Elements.createSessionTanForm({
         sessionId,
-        renderConfig,
+        theme,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
         onExit: ({enabled}) => {
@@ -293,7 +344,7 @@ function showSessionsTable() {
     }
 
     currentElement = Brokerize.Elements.createSessionsTable({
-        renderConfig,
+        theme,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
         onEnableSessionTan({ sessionId }) {
@@ -304,7 +355,7 @@ function showSessionsTable() {
 
 function showCancelOrderForm(portfolioId, orderId) {
     currentElement = Brokerize.Elements.createCancelOrderForm({
-        renderConfig,
+        theme,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
 
@@ -322,7 +373,7 @@ function showCancelOrderForm(portfolioId, orderId) {
 
 function showChangeOrderForm(orderId) {
     currentElement = Brokerize.Elements.createChangeOrderForm({
-        renderConfig,
+        theme,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
 
@@ -341,7 +392,7 @@ function showOrderForm(portfolioId, isin, initialOrder) {
     }
 
     currentElement = Brokerize.Elements.createOrderForm({
-        renderConfig,
+        theme,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
 
@@ -380,6 +431,8 @@ function showOrderForm(portfolioId, isin, initialOrder) {
         //    document.body.appendChild(a);
         //    a.click();
         // }
+
+        quotesProvider
     });
 }
 
@@ -426,7 +479,7 @@ function showLogin() {
         /* the client supports brokerize user logins. */
         currentElement = Brokerize.Elements.createLoginForm({
             renderTo: resetRenderTo(),
-            renderConfig,
+            theme,
             client,
             onGuestLogin() {
                 logInAsGuest();
