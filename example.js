@@ -401,6 +401,11 @@ function showOrderForm(portfolioId, isin, initialOrder) {
 
         initialOrder,
 
+        supportLink: {
+            emailSubject: 'Anfrage zu Trading mit elements-example'
+        },
+
+
         // preferredExchangeId: 4, // a preferred exchange to pre-select in the OrderFor (if allowed) (XETRA: 4, Nasdaq: 45, NYSE: 21, ...)
         // initialOrder: {
         // 	/* may set default values for direction, orderModel, limit, stop, stopLimit, stopLoss, validity */
