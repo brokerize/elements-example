@@ -323,20 +323,26 @@ function showReceipt(orderId) {
     });
 }
 
-function showSessionTanForm(sessionId) {
-    currentElement = Brokerize.Elements.createSessionTanForm({
-        sessionId,
-        theme,
-        renderTo: resetRenderTo(),
-        authorizedApiContext: globalApiCtx,
-        onExit: ({enabled}) => {
-            // if (enabled) {
-            //     alert('Session-TAN aktiviert ✅');
-            // }
-            showSessionsTable();
-        }
-    });
-}
+// Brokerize.Elements.modalService.override({
+//     showSessionTanModal(sessionId) {
+//         overriddenShowSessionTanForm(sessionId);
+//     }
+// })
+
+// function overriddenShowSessionTanForm(sessionId) {
+//     currentElement = Brokerize.Elements.createSessionTanForm({
+//         sessionId,
+//         theme,
+//         renderTo: resetRenderTo(),
+//         authorizedApiContext: globalApiCtx,
+//         onExit: ({enabled}) => {
+//             if (enabled) {
+//                 alert('Session-TAN aktiviert ✅');
+//             }
+//             showSessionsTable();
+//         }
+//     });
+// }
 
 function showSessionsTable() {
     if (!globalApiCtx) {
@@ -346,10 +352,7 @@ function showSessionsTable() {
     currentElement = Brokerize.Elements.createSessionsTable({
         theme,
         renderTo: resetRenderTo(),
-        authorizedApiContext: globalApiCtx,
-        onEnableSessionTan({ sessionId }) {
-            showSessionTanForm(sessionId);
-        },
+        authorizedApiContext: globalApiCtx
     });
 }
 
