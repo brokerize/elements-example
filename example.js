@@ -176,18 +176,28 @@ function setUpModalPortal(authorizedApiContext) {
     modalHost = Brokerize.Elements.createModalHost({
         authorizedApiContext,
         renderTo: document.getElementById('brokerize-modal-portal'),
-        theme
+        theme,
+        // saveDownloadedFile: async (download) => {
+        //    alert('DOWNLOAD');
+        //    const downloadUrl = URL.createObjectURL(download.blob);
+        //    const a = document.createElement('a');
+        //    a.href = downloadUrl;
+        //    a.download = download.filename;
+        //    document.body.appendChild(a);
+        //    a.click();
+        // }
     });
+
+    // // Example for overriding methods on the modalService:
+    // Brokerize.Elements.modalService.override({
+    //     showDetailedTable(table) {
+    //         setTimeout(()=>{
+    //             alert("custom implementation of showDetailedTable: " + JSON.stringify(table));
+    //         }, 200);
+    //     }
+    // })
 }
 
-// Example for overriding methods on the modalService:
-// Brokerize.Elements.modalService.override({
-//     showDetailedTable(table) {
-//         setTimeout(()=>{
-//             alert("custom implementation of showDetailedTable: " + JSON.stringify(table));
-//         }, 200);
-//     }
-// })
 
 /* theme configuration. example themes are available under https://app.brokerize.com/theming/ */
 const theme = {
@@ -424,6 +434,10 @@ function showOrderForm(portfolioId, isin, initialOrder) {
             showReceipt(createdTrade.orderId);
         },
 
+        onOrderError(details) {
+            console.error('order error', details);
+        },
+
         // if openExternalLink is provided, external URLs (e.g. for cost estimation documents)
         // will be opened with this function.
         // openExternalLink(url) {
@@ -431,16 +445,20 @@ function showOrderForm(portfolioId, isin, initialOrder) {
         // }
 
         // if saveDownloadedFile is provided, this will be called when the user saves a document (e.g. cost estimation PDF files).
-        // async saveDownloadedFile(download) {
-        //    const downloadUrl = URL.createObjectURL(download.blob);
-        //    const a = document.createElement('a');
-        //    a.href = downloadUrl;
-        //    a.download = download.filename;
-        //    document.body.appendChild(a);
-        //    a.click();
-        // }
+        async saveDownloadedFile(download) {
+           const downloadUrl = URL.createObjectURL(download.blob);
+           const a = document.createElement('a');
+           a.href = downloadUrl;
+           a.download = download.filename;
+           document.body.appendChild(a);
+           a.click();
+        },
 
-        quotesProvider
+        quotesProvider,
+
+        // if you want to lock the order direction (buy/sell) and hide the order direction switch, set both of these to true:
+        // lockOrderDirection: true
+        // hideOrderDirection: true
     });
 }
 
