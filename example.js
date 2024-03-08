@@ -20,59 +20,75 @@ if (!config || !config.CLIENT_ID) {
     throw new Error("No config provided");
 }
 
-/**
- * @type {SecurityQuotesProvider}
- */
-const quotesProvider = (opts) => {
-		console.log('TODO: init a quotes provider here ', opts);
-		return {
-			async loadMeta() {
-				await new Promise((resolve) => setTimeout(resolve, 3000));
-				return {
-					currency: 'EUR',
-					decimals: 2,
-					quoteSourceName: 'My Quotes Provider'
-				};
-			},
-			subscribe(cb) {
-				const intvl = setInterval(() => {
-					cb(null, {
-						ask: {
-							date: new Date(),
-							quote: 42 + Math.random()
-						},
-						bid: {
-							date: new Date(),
-							quote: 84 + Math.random()
-						}
-					});
-				}, 1000);
-
-				return {
-					unsubscribe() {
-						clearInterval(intvl);
-					}
-				};
-			}
-		};
-	};
 const client = new Brokerize.Client.Brokerize({
     // API configuration
     basePath: config.API_URL,
     clientId: config.CLIENT_ID,
-    cognito: config.COGNITO_CLIENT_ID ? {
-        cognitoFacade: Brokerize.cognitoFacade,
-        poolConfig: {
-            UserPoolId: "eu-central-1_jRMDxLPQW",
-            ClientId: config.COGNITO_CLIENT_ID,
-            Endpoint: null,
-        },
-    } : undefined,
+    cognito: config.COGNITO_CLIENT_ID
+        ? {
+              cognitoFacade: Brokerize.cognitoFacade,
+              poolConfig: {
+                  UserPoolId: "eu-central-1_jRMDxLPQW",
+                  ClientId: config.COGNITO_CLIENT_ID,
+                  Endpoint: null,
+              },
+          }
+        : undefined,
     // provide global dependencies
     fetch: window.fetch.bind(window),
     createAbortController: () => new AbortController(),
     createWebSocket: (url, protocol) => new WebSocket(url, protocol),
 });
+
+/**
+ * An example implementation of a `SecurityQuotesProvider`. Note that this is optional (see below). If you want
+ * your app's security quotes to show up in the OrderForm, implement this. This is just an illustration of how
+ * it can work (it just pushes random quotes every second).
+ *
+ * @type {SecurityQuotesProvider}
+ */
+const quotesProvider = (opts) => {
+    return {
+        async loadMeta() {
+            if (opts.securityQuotesToken != null) {
+                /* securityQuotesToken is set. this means that brokerize can provide
+                   the quotes itself. if we have a very good quality for the selected
+                   security/exchange combination, we might prefer it over the brokerize-provided
+                   prices. in our example, this is not the case! so we just return null
+                   here and let brokerize use its own (or the broker's) prices:  */
+                return null;
+            }
+
+            /* load meta data about the selected quote (we wait 3s to simulate a slow API call) */
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+            return {
+                currency: "EUR",
+                decimals: 2,
+                quoteSourceName: "My Quotes Provider",
+            };
+        },
+        subscribe(cb) {
+            const intvl = setInterval(() => {
+                cb(null, {
+                    ask: {
+                        date: new Date(),
+                        quote: 42 + Math.random(),
+                    },
+                    bid: {
+                        date: new Date(),
+                        quote: 84 + Math.random(),
+                    },
+                });
+            }, 1000);
+
+            return {
+                unsubscribe() {
+                    clearInterval(intvl);
+                },
+            };
+        },
+    };
+};
 
 /* this changes when the user logs in/out of brokerize or starts/ends guest sessions */
 /**
@@ -175,7 +191,7 @@ function setUpModalPortal(authorizedApiContext) {
     modalHost?.destroy();
     modalHost = Brokerize.Elements.createModalHost({
         authorizedApiContext,
-        renderTo: document.getElementById('brokerize-modal-portal'),
+        renderTo: document.getElementById("brokerize-modal-portal"),
         theme,
         // saveDownloadedFile: async (download) => {
         //    alert('DOWNLOAD');
@@ -198,14 +214,13 @@ function setUpModalPortal(authorizedApiContext) {
     // })
 }
 
-
 /* theme configuration. example themes are available under https://app.brokerize.com/theming/ */
 const theme = {
-    layout: 'block',
-	logoStyle: 'light',
-	tokens: {
-		// 'zl-color-primary-base': 'red', /* just a flashy example */
-	}
+    layout: "block",
+    logoStyle: "light",
+    tokens: {
+        // 'zl-color-primary-base': 'red', /* just a flashy example */
+    },
 };
 
 function showBrokerLogin(brokerName) {
@@ -277,6 +292,7 @@ function showPortfolioTable() {
         theme,
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
+        // hideInactivePortfolios: true, /* true to hide portfolios that have no active broker session */
         onNavigate(portfolio) {
             showPortfolioView(portfolio.id);
         },
@@ -362,7 +378,7 @@ function showSessionsTable() {
     currentElement = Brokerize.Elements.createSessionsTable({
         theme,
         renderTo: resetRenderTo(),
-        authorizedApiContext: globalApiCtx
+        authorizedApiContext: globalApiCtx,
     });
 }
 
@@ -391,9 +407,16 @@ function showChangeOrderForm(orderId) {
         authorizedApiContext: globalApiCtx,
 
         orderId,
-        onExit: () => resetRenderTo(),
+        onExit: () => {
+            alert("Order bearbeitet... ✅");
+            const portfolioId = getLastUsedPortfolio();
+            if (portfolioId) {
+                showPortfolioView(portfolioId);
+            } else {
+                resetRenderTo();
+            }
+        },
         onNavigate: (linkTarget) => {
-            debugger;
             showPortfolioView(linkTarget.portfolioId);
         },
     });
@@ -412,16 +435,9 @@ function showOrderForm(portfolioId, isin, initialOrder) {
         portfolioId,
         isin,
 
-        initialOrder,
-
-        supportLink: {
-            emailSubject: 'Anfrage zu Trading mit elements-example'
-        },
-
-
         // preferredExchangeId: 4, // a preferred exchange to pre-select in the OrderFor (if allowed) (XETRA: 4, Nasdaq: 45, NYSE: 21, ...)
         // initialOrder: {
-        // 	/* may set default values for direction, orderModel, limit, stop, stopLimit, stopLoss, validity */
+        // 	/* may set default values for direction, size, orderModel, limit, stop, stopLimit, stopLoss, validity */
         // 	direction: 'sell',
         // 	orderModel: 'limit',
         // 	limit: 25,
@@ -429,13 +445,18 @@ function showOrderForm(portfolioId, isin, initialOrder) {
         // 		type: 'GFD'
         // 	}
         // },
+        initialOrder,
+
+        supportLink: {
+            emailSubject: "Anfrage zu Trading mit elements-example",
+        },
 
         onOrderCreated(createdTrade) {
             showReceipt(createdTrade.orderId);
         },
 
         onOrderError(details) {
-            console.error('order error', details);
+            console.error("order error", details);
         },
 
         // if openExternalLink is provided, external URLs (e.g. for cost estimation documents)
@@ -446,14 +467,17 @@ function showOrderForm(portfolioId, isin, initialOrder) {
 
         // if saveDownloadedFile is provided, this will be called when the user saves a document (e.g. cost estimation PDF files).
         async saveDownloadedFile(download) {
-           const downloadUrl = URL.createObjectURL(download.blob);
-           const a = document.createElement('a');
-           a.href = downloadUrl;
-           a.download = download.filename;
-           document.body.appendChild(a);
-           a.click();
+            const downloadUrl = URL.createObjectURL(download.blob);
+            const a = document.createElement("a");
+            a.href = downloadUrl;
+            a.download = download.filename;
+            document.body.appendChild(a);
+            a.click();
         },
 
+        /* the quotesProvider is optional! if you set it, you should add a meaningful implementation that
+           actually retrieves code from your infrastructure. If you don't have quotes in your
+           application, remove the following line. */
         quotesProvider,
 
         // if you want to lock the order direction (buy/sell) and hide the order direction switch, set both of these to true:
