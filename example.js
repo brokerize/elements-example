@@ -277,9 +277,13 @@ function buy() {
         "US0378331005"
     );
     if (isin) {
-        showOrderForm(currentPortfolioId, isin, {
-            direction: "buy",
-        });
+        showOrderForm(
+            currentPortfolioId,
+            { isin },
+            {
+                direction: "buy",
+            }
+        );
     }
 }
 
@@ -315,10 +319,10 @@ function showPortfolioView(portfolioId) {
         //   open the external URL here. For example, this can be used in mobile apps to use a custom way of showing external content.
         // },
         onBuy(opts) {
-            showOrderForm(portfolioId, opts.isin, { direction: "buy" });
+            showOrderForm(portfolioId, opts.security, { direction: "buy" });
         },
         onSell(opts) {
-            showOrderForm(portfolioId, opts.isin, {
+            showOrderForm(portfolioId, opts.security, {
                 direction: "sell",
                 size: opts.availableSize,
             });
@@ -422,7 +426,7 @@ function showChangeOrderForm(orderId) {
     });
 }
 
-function showOrderForm(portfolioId, isin, initialOrder) {
+function showOrderForm(portfolioId, security, initialOrder) {
     if (!globalApiCtx) {
         return alert("you must authorize first.");
     }
@@ -433,7 +437,7 @@ function showOrderForm(portfolioId, isin, initialOrder) {
         authorizedApiContext: globalApiCtx,
 
         portfolioId,
-        isin,
+        security,
 
         // preferredExchangeId: 4, // a preferred exchange to pre-select in the OrderFor (if allowed) (XETRA: 4, Nasdaq: 45, NYSE: 21, ...)
         // initialOrder: {
@@ -568,11 +572,15 @@ async function startExampleOrderFlow() {
     if (!portfolioId) {
         showBrokerList();
     } else {
-        showOrderForm(portfolioId, "US0378331005", {
-            direction: "buy",
-            orderModel: "limit",
-            limit: 15,
-        });
+        showOrderForm(
+            portfolioId,
+            { isin: "US0378331005" },
+            {
+                direction: "buy",
+                orderModel: "limit",
+                limit: 15,
+            }
+        );
     }
 }
 
