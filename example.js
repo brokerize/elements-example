@@ -20,6 +20,12 @@ if (!config || !config.CLIENT_ID) {
     throw new Error("No config provided");
 }
 
+// If you would like to self-host static assets instead of using the brokerize CDN under https://assets.brokerize.com,
+// configure this:
+// Brokerize.Elements.configure({
+//     assetsPath: '<MY-HOSTING-PATH-FOR>/node_modules/@brokerize/elements/assets'
+// })
+
 const client = new Brokerize.Client.Brokerize({
     // API configuration
     basePath: config.API_URL,
@@ -131,8 +137,12 @@ function showError(err) {
     alert("ERROR: " + JSON.stringify(err));
 }
 
-function setLogin(authCtxCfg) {
+function storeTokens(authCtxCfg) {
     sessionStorage.setItem("brokerize", JSON.stringify(authCtxCfg));
+}
+
+function setLogin(authCtxCfg) {
+    storeTokens(authCtxCfg);
     initSessionIf();
 }
 
@@ -152,7 +162,10 @@ function initSessionIf() {
     if (!cfg) {
         showLogin();
     } else {
-        globalApiCtx = client.createAuthorizedContext(cfg);
+        globalApiCtx = client.createAuthorizedContext(cfg, (updatedTokens) => {
+            console.log('tokens where updated');
+            storeTokens(updatedTokens);
+        });
         globalApiCtx.subscribeLogout((err) => {
             console.log(
                 err,
@@ -232,6 +245,11 @@ function showBrokerLogin(brokerName) {
         theme,
         brokerName,
         authorizedApiContext: globalApiCtx,
+        // onRedirect(url) {
+        //     const urlObject = new URL(url);
+        //     urlObject.searchParams.set('state', 'my-state-string');
+        //     window.location.href = urlObject.toString();
+        // },
         onExit({ loggedIn }) {
             showPortfolioTable();
         },
@@ -353,11 +371,15 @@ function showReceipt(orderId) {
     });
 }
 
-// Brokerize.Elements.modalService.override({
-//     showSessionTanModal(sessionId) {
-//         overriddenShowSessionTanForm(sessionId);
-//     }
-// })
+Brokerize.Elements.modalService.override({
+    // showSessionTanModal(sessionId) {
+    //     overriddenShowSessionTanForm(sessionId);
+    // }
+    // showToast(opts) {
+    //     alert('custom implementation of showToast: ' + JSON.stringify(opts));
+    // }
+})
+
 
 // function overriddenShowSessionTanForm(sessionId) {
 //     currentElement = Brokerize.Elements.createSessionTanForm({
