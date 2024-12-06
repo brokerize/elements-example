@@ -29,6 +29,7 @@ if (!config || !config.CLIENT_ID) {
 const client = new Brokerize.Client.Brokerize({
     // API configuration
     basePath: config.API_URL,
+    basePathCryptoService: config.API_URL_CRYPTO_SERVICE,
     clientId: config.CLIENT_ID,
     cognito: config.COGNITO_CLIENT_ID
         ? {
