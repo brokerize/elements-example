@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/brokerize/elements-example#readme",
   "dependencies": {
-    "@brokerize/elements": "1.1.0"
+    "@brokerize/elements": "1.1.1"
   }
 }
