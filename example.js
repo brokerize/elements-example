@@ -414,6 +414,8 @@ function showCancelOrderForm(portfolioId, orderId) {
         onNavigate: (linkTarget) => {
             showPortfolioView(linkTarget.portfolioId);
         },
+
+        // reportingTag: 'optionalTagForOrderReports'
     });
 }
 
@@ -436,6 +438,7 @@ function showChangeOrderForm(orderId) {
         onNavigate: (linkTarget) => {
             showPortfolioView(linkTarget.portfolioId);
         },
+        // reportingTag: 'optionalTagForOrderReports'
     });
 }
 
@@ -496,6 +499,8 @@ function showOrderForm(portfolioId, security, initialOrder) {
            actually retrieves code from your infrastructure. If you don't have quotes in your
            application, remove the following line. */
         quotesProvider,
+
+        // reportingTag: 'optionalTagForOrderReports'
 
         // if you want to lock the order direction (buy/sell) and hide the order direction switch, set both of these to true:
         // lockOrderDirection: true
