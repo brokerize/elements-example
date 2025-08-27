@@ -312,6 +312,24 @@ function showPortfolioTable() {
     });
 }
 
+function showOverview() {
+    if (!globalApiCtx) {
+        return alert("you must authorize first.");
+    }
+
+    currentElement = Brokerize.Elements.createOverview({
+        theme,
+        renderTo: resetRenderTo(),
+        authorizedApiContext: globalApiCtx,
+        onNavigate(portfolio) {
+            showPortfolioView(portfolio.id);
+        },
+        onLogin({brokerName}) {
+            showBrokerLogin(brokerName);
+        }
+    });
+}
+
 function showPortfolioView(portfolioId) {
     if (!globalApiCtx) {
         return alert("you must authorize first.");
@@ -386,6 +404,19 @@ Brokerize.Elements.modalService.override({
 //         }
 //     });
 // }
+
+function showMain() {
+    if (!globalApiCtx) {
+        return alert("you must authorize first.");
+    }
+
+    currentElement = Brokerize.Elements.createBrokerizeMain({
+        theme,
+        renderTo: resetRenderTo(),
+        authorizedApiContext: globalApiCtx,
+        returnToUrl: "http://localhost:8080",
+    });
+}
 
 function showSessionsTable() {
     if (!globalApiCtx) {

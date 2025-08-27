@@ -1,8 +1,20 @@
 <html>
 	<body>
 		<h1>some general remarks</h1>
-		<style>
-			.post-content ul:not(.no-list) {
+		<style nonce="abc123">
+			#big-buy-button {
+				display: none;
+				background-color: rgb(0, 255, 0);
+				font-size: 1.5em;
+			}
+
+			.brokerize-viewport {
+				padding: 2em;
+				margin: 2em;
+				max-width: 70%;
+			}
+
+			.brokerize-viewport ul:not(.no-list) {
 				list-style: disc;
 			}
 
@@ -41,6 +53,18 @@
 				(when logged in)
 			</li>
 			<li>
+				<a href="#" onclick="showOverview()"
+					><code>showOverview</code></a
+				>
+				(when logged in)
+			</li>
+			<li>
+				<a href="#" onclick="showMain()"
+					><code>showMain</code></a
+				>
+				(when logged in)
+			</li>
+			<li>
 				<a href="#" onclick="resetRenderTo()"
 					><code>resetRenderTo</code></a
 				>
@@ -66,18 +90,12 @@
 		<h1>the <code>renderTo</code> element</h1>
 		<div
 			id="content"
-			style="padding: 2em; margin: 2em; max-width: 70%"
-			class="post-content"
+			class="brokerize-viewport"
 		>
 		</div>
 
 		<button
 			id="big-buy-button"
-			style="
-				display: none;
-				background-color: rgb(0, 255, 0);
-				font-size: 1.5em;
-			"
 			onclick="buy()"
 		>
 			click this button to buy in current portfolio
