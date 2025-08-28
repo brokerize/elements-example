@@ -174,7 +174,7 @@ function initSessionIf() {
             globalApiCtx.confirmOAuth({ code, ticketId }).then(
                 () => {
                     cleanUpUrl();
-                    showSessionsTable();
+                    showOverview();
                 },
                 (err) => {
                     showError(
@@ -185,7 +185,7 @@ function initSessionIf() {
                 }
             );
         } else {
-            showBrokerList();
+            showOverview();
         }
     }
 }
@@ -247,7 +247,7 @@ function showBrokerLogin(brokerName) {
 
         // returnTo URL to use for OAuth based broker logins. Dfaults to window.location.href,
         // but can be overriden (for example if there is a fixed "re-entry" URL)
-        returnToUrl: "http://localhost:8080",
+        returnToUrl: "http://localhost:8080/individual-components.html",
 
         // example code for interacting with a secure credential storage. This interface can be used to store credentials *in native apps*
         // web apps MUST NOT store those credentials - there is no browser API to do this. Web apps simply rely on the browser's

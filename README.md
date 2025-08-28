@@ -21,7 +21,11 @@ Add your `CLIENT_ID` (and, if applicable, `COGNITO_CLIENT_ID`) to the `config.js
 ## run the example
 Due to CORS restrictions, the example should usually be run on some URL like `http://localhost:8080`. If you have created the `CLIENT_ID` on your own, you can configure the allowed origins and redirect URIs under https://app-preview.brokerize.com/admin.
 
-Just serve the content, for example by running `$ npx http-server -p 8080 .`. Now navigate to `http://localhost:8080` to see the example app.
+Just serve the content, for example by running `$ npx http-server -p 8080 .`.
+
+# available examples
+- http://localhost:8080/brokerize-main.html is a showcase for the `BrokerizeMain` component, which is the easiest way to get started
+- http://localhost:8080/individual-components.html is a showcase for the individual components, which allows more flexible applications
 
 ## how to log in to a broker
 By default, new client ids may only access the "demo broker". Therefore, the `BrokerList` will only present one broker logo ("brokerize") to allow testing of the UI components. Once your frontend is ready to be tested, the client can be enabled to work with all our supported brokers. The demo broker is supposed to simulate many edge cases that are hard to reproduce in real broker environments. See https://api-preview.brokerize.com/docs/#tag/demobroker for a description of the demo broker's behavior.
