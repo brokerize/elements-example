@@ -63,7 +63,7 @@ function cleanUpUrl() {
     for (const key of ["verifysession", "code", "ticketId"]) {
         url.searchParams.delete(key);
     }
-    window.history.replaceState(url);
+    window.location.replace(url);
 }
 
 /* restore session from sessionStorage, if possible */
