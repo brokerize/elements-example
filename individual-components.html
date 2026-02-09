@@ -1,6 +1,8 @@
+<!DOCTYPE html>
 <html>
-    <body>
+    <body data-scroll-locked="2">
         <h1>some general remarks</h1>
+        <script src="https://cdn.tailwindcss.com"></script>
         <style nonce="abc123">
             #big-buy-button {
                 display: none;
@@ -8,19 +10,44 @@
                 font-size: 1.5em;
             }
 
-            .brokerize-viewport {
-                padding: 2em;
-                margin: 2em;
-                max-width: 70%;
+
+            .with-scroll-bars-hidden {
+            overflow: hidden !important;
+            padding-right: 0px !important;
+            }
+            body[data-scroll-locked] {
+                overflow: hidden !important;
+                overscroll-behavior: contain;
+                position: relative !important;
+                padding-left: 0px;
+                padding-top: 0px;
+                padding-right: 0px;
+                margin-left:0;
+                margin-top:0;
+                margin-right: 0px !important;
+                
+            }
+            
+            .right-scroll-bar-position {
+                right: 0px !important;
+            }
+            
+            .width-before-scroll-bar {
+                margin-right: 0px !important;
+            }
+            
+            .right-scroll-bar-position .right-scroll-bar-position {
+                right: 0 !important;
+            }
+            
+            .width-before-scroll-bar .width-before-scroll-bar {
+                margin-right: 0 !important;
+            }
+            
+            body[data-scroll-locked] {
+                --removed-body-scroll-bar-size: 0px;
             }
 
-            .brokerize-viewport ul:not(.no-list) {
-                list-style: disc;
-            }
-
-            html zl-module * {
-                all: initial !important;
-            }
         </style>
         <ul>
             <li>
@@ -93,7 +120,7 @@
         </ul>
 
         <h1>the <code>renderTo</code> element</h1>
-        <div id="content" class="brokerize-viewport"></div>
+        <div id="content" class="bg-background data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed z-50 grid w-full gap-4 rounded-lg border p-6 shadow-lg duration-200 bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-h-[80vh] lg:bottom-auto lg:top-[50%] lg:left-[50%] lg:translate-x-[-50%] lg:translate-y-[-50%] max-w-full lg:max-w-[1200px] overflow-y-auto lg:max-h-[85vh]"></div>
 
         <button id="big-buy-button" onclick="buy()">
             click this button to buy in current portfolio
