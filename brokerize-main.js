@@ -146,6 +146,7 @@ function showMain() {
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
         returnToUrl: "http://localhost:8080/brokerize-main.html",
+        preferredExchangeId: 22
     });
 }
 
@@ -162,8 +163,8 @@ function acquireBrokerizeGuestUser() {
 async function startExampleOrderFlow() {
     brokerizeMainElement.navigation.startOrderFlow({
         security: {
-            name: "Apple",
-            selector: { isin: "US0378331005" },
+            name: "DE0005557508",
+            selector: { isin: "DE0005557508" },
         },
         initialOrderCreateValues: {
             direction: "buy",
