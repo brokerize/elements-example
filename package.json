@@ -19,6 +19,6 @@
   "homepage": "https://github.com/brokerize/elements-example#readme",
   "dependencies": {
     "@brokerize/client": "^1.3.10",
-    "@brokerize/elements": "1.5.1"
+    "@brokerize/elements": "2.0.0"
   }
 }
