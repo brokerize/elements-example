@@ -20,6 +20,10 @@ if (!config || !config.CLIENT_ID) {
     throw new Error("No config provided");
 }
 
+// set this to "en" to have the elements appear in English. Note that in that case you should also configure the same locale below in the client config.
+const locale = 'de'; // or "en"
+Brokerize.Elements.configure({ locale });
+
 const client = new Brokerize.Client.Brokerize({
     // API configuration
     basePath: config.API_URL,
@@ -29,6 +33,7 @@ const client = new Brokerize.Client.Brokerize({
     fetch: window.fetch.bind(window),
     createAbortController: () => new AbortController(),
     createWebSocket: (url, protocol) => new WebSocket(url, protocol),
+    acceptLanguage: locale
 });
 
 /* this changes when the user logs in/out of brokerize or starts/ends guest sessions */
