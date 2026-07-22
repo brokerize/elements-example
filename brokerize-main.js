@@ -151,7 +151,12 @@ function showMain() {
         renderTo: resetRenderTo(),
         authorizedApiContext: globalApiCtx,
         returnToUrl: "http://localhost:8080/brokerize-main.html",
-        preferredExchangeId: 22
+        preferredExchangeId: 22,
+        onPortfolioSelected: ({ portfolioId, portfolioIdHash }) => {
+            /* with this optional callback, we get notified when the user selects a different portfolio. we persist the "last used idHash" in LocalStorage */
+            console.log('portfolio selected:', {portfolioId, portfolioIdHash} );
+            localStorage.setItem("last-used-portfolio-id-hash", portfolioIdHash);
+        }
     });
 }
 
@@ -166,6 +171,7 @@ function acquireBrokerizeGuestUser() {
 }
 
 async function startExampleOrderFlow() {
+    const portfolioIdHash = localStorage.getItem("last-used-portfolio-id-hash"); // optional: pass the idHash of the last used portfolio so that the user lands in the right one
     brokerizeMainElement.navigation.startOrderFlow({
         security: {
             name: "DE0005557508",
@@ -176,6 +182,7 @@ async function startExampleOrderFlow() {
             orderModel: "limit",
             limit: 15,
         },
+        portfolioIdHash
     });
 }
 
